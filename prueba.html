@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfico con Plotly</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <div id="grafico" style="width:100%;max-width:900px;height:600px;"></div>
+
+  <script>
+    const anos = [
+      2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016,
+      2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+    ];
+
+    const hombres_vista = [
+      359370.188543, 457664.939232, 539383.618131, 693334.548189,
+      736595.585143, 910696.630865, 1081056.118275, 1217358.629258,
+      1489443.627834, 1755260.811604, 1902124.604696, 6346916.130928,
+      6053039.933197, 3948732.023606, 3634309, 3500037
+    ];
+
+    const hombres_corriente = [
+    3327685, 3841190, 4201258, 4699939,
+    5315278, 6026295, 6969557, 7514300,
+    8081416, 8676228, 10208796, 15866373,
+    20211883, 14033266, 13224149, 14383205
+    ];
+
+    const mujeres_vista = [
+      2375016, 2698458, 2988111, 3332949,
+      3754000, 4201850, 4828737, 5175893,
+      5529599, 5868573, 6866398, 10609646,
+      13232561, 9024227, 8412775, 9135779
+
+    ];
+
+    const mujeres_corriente = [
+        952670, 1142731, 1213146, 1366991,
+        1561277, 1824445, 2140820, 2338407,
+        2551816, 2807654, 3342398, 5256727,
+        6979322, 5009039, 4811374, 5247427
+    ];
+    
+    const trace1 = {
+      x: anos,
+      y: hombres_vista,
+      mode: 'lines+markers',
+      name: 'Hombres vista',
+      line: {color: 'blue'}
+    };
+
+    const trace2 = {
+      x: anos,
+      y: mujeres_vista,
+      mode: 'lines+markers',
+      name: 'Mujeres vista',
+      line: {color: 'red'}
+    };
+
+    const trace3 = {
+        x: anos,
+        y: hombres_corriente,
+        mode: 'lines+markers',
+        name: 'Hombres corriente',
+        line: {color: 'blue', dash: 'dash'}
+    };
+
+    const trace4 = {
+        x: anos,
+        y: mujeres_corriente,
+        mode: 'lines+markers',
+        name: 'Mujeres corriente',
+        line: {color: 'red', dash: 'dash'}
+    };
+
+    const layout = {
+      title: 'Saldos nominales de cuentas vista y corriente (2009-2024)',
+      xaxis: {title: 'Año'},
+      yaxis: {title: 'Saldo nominal ($)'},
+      legend: {orientation: 'h', y: -0.2}
+    };
+
+    Plotly.newPlot('grafico', [trace1, trace2, trace3, trace4], layout);
+  </script>
+</body>
+</html>
