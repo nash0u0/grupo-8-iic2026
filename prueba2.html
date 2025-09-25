@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Choropleth de Chile por Región</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    #mapa {
+        width: 80%;
+        max-width: 800px;
+        height: 600px;
+        margin: 0 auto; /* centra horizontalmente */
+    }
+
+  </style>
+</head>
+<body>
+  <h2>Choropleth de Chile por Región</h2>
+  <div id="mapa"></div>
+
+  <script>
+    const geojson_url = "https://raw.githubusercontent.com/caracena/chile-geojson/master/regiones.json";
+
+    d3.json(geojson_url).then(function(geojson) {
+        const locations = geojson.features.map(f => f.properties.codregion);
+        const z = locations.map((_, i) => i + 1);
+
+        var data = [{
+        type: 'choropleth',
+        geojson: geojson,
+        locations: locations, // ids de cada región en tu geojson
+        z: z, // valores por región (este hara que cambie el tono de cada region)
+        featureidkey: 'properties.codregion', // depende de cómo se llama el campo en tu geojson
+        colorscale: 'Red'
+        }];
+
+        var layout = {
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            geo: {
+                scope: 'south america', // opcional, ayuda a recortar un poco el mapa
+                center: { lon: -70, lat: -40 }, // longitud y latitud del centro de Chile
+                projection: {
+                    type: 'mercator', // puedes usar 'natural earth', 'orthographic', etc.
+                    scale: 1.7 // cuanto mayor, más cerca (zoom)
+                },
+                showland: true, // false deja solo Chile!!
+                landcolor: 'lightgray',
+                showcountries: true,
+                countrycolor: 'white'
+            }
+        };
+
+        Plotly.newPlot('mapa', data, layout);
+    });
+  </script>
+</body>
+</html>
