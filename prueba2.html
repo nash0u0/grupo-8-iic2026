@@ -15,14 +15,51 @@
 
   </style>
   <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #EDEDED;
+    body{
+      font-family: Arial, sans-serif;
+      background-color: #EDEDED;
     }
-  </style>
+
+    :root{
+      --accent: #b30000;      /* color de acento (rojo) */
+      --text-main: #111827;   /* casi negro */
+    }
+
+    .headline{
+      text-align: center;
+      margin: 16px 0 8px;
+      line-height: 1.12;
+      font-family: Arial, sans-serif;
+    }
+
+    .headline h1{
+      margin: 0;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 150;                 /* base más liviana */
+      color: var(--text-main);
+    }
+
+    /* Aquí sí se nota el <b> dentro del h1 */
+    .headline h1 b,
+    .headline h1 strong{
+      font-weight: 600;                 /* más pesado que el base */
+    }
+
+    .headline .accent{
+      color: var(--accent);
+    }
+</style>
+
 </head>
 <body>
-  <h2 style="text-align: center;">Choropleth de Chile por Región</h2>
+  <div class="headline">
+    <h1>
+      Regiones con la<br>
+      <b>Brecha Salarial</b><br>
+      <span class="accent"><b>Más Alta</b></span>
+    </h1>
+  </div>
+
   <div id="mapa"></div>
 
   <script>
