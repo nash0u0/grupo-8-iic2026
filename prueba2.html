@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Choropleth de Chile por Región</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <style>
     #mapa {
@@ -11,28 +11,47 @@
         max-width: 800px;
         height: 600px;
         margin: 0 auto; /* centra horizontalmente */
-    }
+    };
 
   </style>
 </head>
 <body>
-  <h2>Choropleth de Chile por Región</h2>
+  <h2 style="text-align: center;">Choropleth de Chile por Región</h2>
   <div id="mapa"></div>
 
   <script>
     const geojson_url = "https://raw.githubusercontent.com/caracena/chile-geojson/master/regiones.json";
 
     d3.json(geojson_url).then(function(geojson) {
-        const locations = geojson.features.map(f => f.properties.codregion);
-        const z = locations.map((_, i) => i + 1);
+        geojson.features.forEach(x => {
+          if (x.properties.Region.startsWith("Región del ")) {
+            x.properties.Region = x.properties.Region.slice(11);
+          } else {
+            x.properties.Region = x.properties.Region.slice(10);
+          }
+        });
+        const locations = geojson.features.map(f => f.properties.Region);
+        const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2]
+        console.log(geojson);
+        console.log(locations);
 
         var data = [{
-        type: 'choropleth',
-        geojson: geojson,
-        locations: locations, // ids de cada región en tu geojson
-        z: z, // valores por región (este hara que cambie el tono de cada region)
-        featureidkey: 'properties.codregion', // depende de cómo se llama el campo en tu geojson
-        colorscale: 'Red'
+          type: 'choropleth',
+          geojson: geojson,
+          locations: locations, // ids de cada región en tu geojson
+          z: z, // valores por región (este hara que cambie el tono de cada region)
+          featureidkey: 'properties.Region', // depende de cómo se llama el campo en tu geojson
+          colorscale: 'Red',
+          colorbar: {
+            orientation: 'h',   // horizontal
+            x: 0.5,             // centro en eje X
+            xanchor: 'center',  // anclar al centro
+            y: -0.12,             // debajo del gráfico
+            title: {
+              text: "Brecha Salarial (%)",
+              side: "bottom"
+            }
+          }
         }];
 
         var layout = {
@@ -44,14 +63,44 @@
                     type: 'mercator', // puedes usar 'natural earth', 'orthographic', etc.
                     scale: 1.7 // cuanto mayor, más cerca (zoom)
                 },
-                showland: true, // false deja solo Chile!!
+                showland: false, // false deja solo Chile!!
                 landcolor: 'lightgray',
                 showcountries: true,
-                countrycolor: 'white'
-            }
+                countrycolor: 'white',
+            },
+            annotations: [
+              {
+                x: 0.52, y: 0.86,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
+                xref: 'paper', yref: 'paper',
+                ax: 170,
+                text: 'Q pá con Antofa',
+                showarrow: true,
+                font: { size: 18, color: 'black' },
+                bgcolor: 'rgba(0,0,0,0.1)', // fondo semi-transparente
+                bordercolor: 'black',
+                borderwidth: 0,
+                borderpad: 5,
+                arrowhead: 0,
+                arrowwidth: 1
+              },
+              {
+                x: 0.48, y: 0.58,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
+                xref: 'paper', yref: 'paper',
+                ax: -170, ay: 100,
+                text: 'Q pá con Ñuble',
+                showarrow: true,
+                font: { size: 18, color: 'black' },
+                bgcolor: 'rgba(0,0,0,0.1)', // fondo semi-transparente
+                bordercolor: 'black',
+                borderwidth: 0,
+                borderpad: 5,
+                arrowhead: 0,
+                arrowwidth: 1
+              }
+            ]
         };
 
-        Plotly.newPlot('mapa', data, layout);
+        Plotly.newPlot('mapa', data, layout, { staticPlot: true });
     });
   </script>
 </body>
