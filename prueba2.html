@@ -34,8 +34,6 @@
         const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2];
         const breaks = [5, 10, 15, 20, 25, 30, 35]; // límites de clase
         const colors = ['#fff7ec','#fee8c8','#fdd49e','#fdbb84','#ef6548','#b30000']; // OrRd[6]
-        console.log(geojson);
-        console.log(locations);
 
         function steppedColorscale(breaks, colors) {
         const zmin = breaks[0], zmax = breaks[breaks.length - 1];
@@ -101,21 +99,22 @@
               {
                 x: 0.52, y: 0.86,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
-                ax: 170,
+                ax: 170, ay: 0,
                 text: 'Q pá con Antofa',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
                 bgcolor: 'rgba(0,0,0,0.1)', // fondo semi-transparente
-                bordercolor: 'black',
-                borderwidth: 0,
+                bordercolor: 'Red',
+                borderwidth: 0.5,
                 borderpad: 5,
                 arrowhead: 0,
-                arrowwidth: 1
+                arrowwidth: 1,
+                arrowcolor: 'Black'
               },
               {
                 x: 0.48, y: 0.58,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
-                ax: -170, ay: 100,
+                ax: -170, ay: 0,
                 text: 'Q pá con Ñuble',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
@@ -124,7 +123,8 @@
                 borderwidth: 0,
                 borderpad: 5,
                 arrowhead: 0,
-                arrowwidth: 1
+                arrowwidth: 1,
+                arrowcolor: 'Black'
               }
             ]
         };
