@@ -50,6 +50,20 @@
     }
 </style>
 
+<style>
+  .desc{
+    max-width: 900px;
+    margin: 10px auto 22px;
+    padding: 0 12px;
+    text-align: justify;
+    font-size: clamp(14px, 1.6vw, 18px);
+    line-height: 1.55;
+    color: #374151; /* gris oscuro legible */
+  }
+  .desc p{ margin: 100 0 10px; }
+  
+</style>
+
 </head>
 <body>
   <div class="headline">
@@ -59,6 +73,13 @@
       <span class="accent"><b>Más Alta</b></span>
     </h1>
   </div>
+
+  <div class="desc">
+    <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile al ser un país metropolitano no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos de las regiones alteran los datos extraídos de la tan poblada capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
+    <p>Por ejemplo, la Región de Antofagasta presenta la mayor diferencia, alcanzando un 33,9%, debido a la alta presencia de sectores mineros extractivos, altamente masculinizados y de altos salarios. En contraste con la Región de Ñuble registra la menor brecha (4,8%), aunque con medianas de ingreso de las más bajas del país, lo que evidencia que una menor desigualdad no necesariamente implica mejores condiciones económicas.</p>
+    <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género y como hay comportamientos mas definidos por las distintas zonas Chilenas.</p>
+  </div>
+
 
   <div id="mapa"></div>
 
@@ -145,11 +166,11 @@
                 x: 0.52, y: 0.86,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
                 ax: 200, ay: 0,
-                text: 'Región de Antofagasta <b>(33.9%)</b>',
+                text: 'Región de Antofagasta <br><b>(33.9%)</b>',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
                 bgcolor: '#EDEDED', // fondo semi-transparente
-                bordercolor: '#b30000',
+                bordercolor: 'black',
                 borderwidth: 1,
                 borderpad: 5,
                 arrowhead: 0,
@@ -160,11 +181,11 @@
                 x: 0.48, y: 0.58,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
                 ax: -170, ay: 0,
-                text: 'Región de Ñuble <b>(4.8%)</b>',
+                text: 'Región de Ñuble <br><b>(4.8%)</b>',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
                 bgcolor: '#EDEDED', // fondo semi-transparente
-                bordercolor: '#fdd49e',
+                bordercolor: 'black',
                 borderwidth: 1,
                 borderpad: 5,
                 arrowhead: 0,
