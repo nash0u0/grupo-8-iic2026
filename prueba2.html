@@ -14,6 +14,12 @@
     }
 
   </style>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #EDEDED;
+    }
+  </style>
 </head>
 <body>
   <h2 style="text-align: center;">Choropleth de Chile por Región</h2>
@@ -33,7 +39,7 @@
         const locations = geojson.features.map(f => f.properties.Region);
         const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2];
         const breaks = [5, 10, 15, 20, 25, 30, 35]; // límites de clase
-        const colors = ['#fff7ec','#fee8c8','#fdd49e','#fdbb84','#ef6548','#b30000']; // OrRd[6]
+        const colors = ['#fdd49e', '#fdbb84', '#fc8d59', '#ef6548', '#d7301f', '#b30000']; // OrRd[6]
 
         function steppedColorscale(breaks, colors) {
         const zmin = breaks[0], zmax = breaks[breaks.length - 1];
@@ -62,7 +68,7 @@
           colorscale: colorscale,
           marker: {
             line: {
-              color: 'rgba(0,0,0,0.5)',
+              color: 'rgba(0,0,0,0.05)',
               width: 0.4
             }
           },
@@ -83,6 +89,7 @@
 
         var layout = {
             margin: { t: 0, b: 0, l: 0, r: 0 },
+            paper_bgcolor: '#EDEDED', // transparente
             geo: {
                 scope: 'south america', // opcional, ayuda a recortar un poco el mapa
                 center: { lon: -70, lat: -40 }, // longitud y latitud del centro de Chile
@@ -93,38 +100,39 @@
                 showland: false, // false deja solo Chile!!
                 landcolor: 'lightgray',
                 showcountries: true,
-                countrycolor: 'white',
+                countrycolor: '#EDEDED',
+                bgcolor: '#EDEDED' // transparente
             },
             annotations: [
               {
                 x: 0.52, y: 0.86,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
-                ax: 170, ay: 0,
-                text: 'Q pá con Antofa',
+                ax: 200, ay: 0,
+                text: 'Región de Antofagasta <b>(33.9%)</b>',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
-                bgcolor: 'rgba(0,0,0,0.1)', // fondo semi-transparente
-                bordercolor: 'Red',
-                borderwidth: 0.5,
+                bgcolor: '#EDEDED', // fondo semi-transparente
+                bordercolor: '#b30000',
+                borderwidth: 1,
                 borderpad: 5,
                 arrowhead: 0,
                 arrowwidth: 1,
-                arrowcolor: 'Black'
+                arrowcolor: 'black'
               },
               {
                 x: 0.48, y: 0.58,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
                 xref: 'paper', yref: 'paper',
                 ax: -170, ay: 0,
-                text: 'Q pá con Ñuble',
+                text: 'Región de Ñuble <b>(4.8%)</b>',
                 showarrow: true,
                 font: { size: 18, color: 'black' },
-                bgcolor: 'rgba(0,0,0,0.1)', // fondo semi-transparente
-                bordercolor: 'black',
-                borderwidth: 0,
+                bgcolor: '#EDEDED', // fondo semi-transparente
+                bordercolor: '#fdd49e',
+                borderwidth: 1,
                 borderpad: 5,
                 arrowhead: 0,
                 arrowwidth: 1,
-                arrowcolor: 'Black'
+                arrowcolor: 'black'
               }
             ]
         };
