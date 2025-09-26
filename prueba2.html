@@ -94,7 +94,7 @@
       background: var(--bg);
 
     }
-    #chartCapital.chart{ height: 60px; }
+    #chartCapital.chart{ height: 70px; }
 
     /* Responsive: apilar en pantallas pequeñas */
     @media (max-width: 992px){
@@ -123,23 +123,23 @@
         <b>Brecha Salarial</b><br>
         <span class="accent"><b>Más Alta</b></span>
       </h1>
+      <div class="desc">
+        <p>La brecha salarial de género ha sido y sigue siendo uno de los temas más relevantes en el ámbito laboral del país. De acuerdo con CASEN 2022 (BCN, 2023), los hombres perciben en promedio un 16% más que las mujeres. A nivel regional, las diferencias son heterogéneas, con zonas que exhiben brechas muy superiores o inferiores al promedio nacional.</p>
+      </div>
+      <div class="desc">
+        <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género (a favor de los hombres) y cómo existen patrones más definidos por zonas del país.</p>
+      </div>
     </div>
 
     <!-- IZQUIERDA / DERECHA -->
     <div class="split">
       <!-- Columna izquierda -->
       <div class="left">
-        <div class="desc">
-          <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género (a favor de los hombres) y cómo existen patrones más definidos por zonas del país.</p>
-        </div>
         <div id="mapa"></div>
       </div>
 
       <!-- Columna derecha -->
       <div class="right">
-        <div class="desc">
-          <p>La brecha salarial de género ha sido y sigue siendo uno de los temas más relevantes en el ámbito laboral del país. De acuerdo con CASEN 2022 (BCN, 2023), los hombres perciben en promedio un 16% más que las mujeres. A nivel regional, las diferencias son heterogéneas, con zonas que exhiben brechas muy superiores o inferiores al promedio nacional.</p>
-        </div>
 
         <div class="sections">
           <div class="section" id="secDisparejos">
@@ -309,7 +309,7 @@
         colorbar: {
           orientation: 'h',
           x: 0.5, xanchor: 'center',
-          y: -0.12, yanchor: 'top',   // << debajo del mapa
+          y: -0.08, yanchor: 'bottom',   // << debajo del mapa
           title: { text: "Brecha Salarial (%)", side: "top" },
           len: 0.6, thickness: 15,
           tickmode: 'array',
@@ -331,7 +331,6 @@
           countrycolor: '#EDEDED',
           bgcolor: '#EDEDED'
         },
-        // === (1) Texto en la misma posición donde estaba la escala antes ===
         annotations: [
           {
             x: 0.5, y: 1.15,
