@@ -106,22 +106,29 @@
       .chart{ height: 150px; }
       #chartCapital.chart{ height: 56px; }
     }
+
+  footer {
+    background-color: #8d7f7f;
+    padding: 10px;
+    text-align: center;
+    color: white;
+  }
   </style>
 </head>
 <body>
   <div class="page">
+    <div class="headline">
+      <h1>
+        Regiones con la<br>
+        <b>Brecha Salarial</b><br>
+        <span class="accent"><b>Más Alta</b></span>
+      </h1>
+    </div>
 
     <!-- IZQUIERDA / DERECHA -->
     <div class="split">
       <!-- Columna izquierda -->
       <div class="left">
-        <div class="headline">
-          <h1>
-            Regiones con la<br>
-            <b>Brecha Salarial</b><br>
-            <span class="accent"><b>Más Alta</b></span>
-          </h1>
-        </div>
         <div class="desc">
           <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género (a favor de los hombres) y cómo existen patrones más definidos por zonas del país.</p>
         </div>
@@ -131,8 +138,7 @@
       <!-- Columna derecha -->
       <div class="right">
         <div class="desc">
-          <br></br>
-          <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile, al ser un país metropolitano, no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos regionales alteran los datos de la capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
+          <p>La brecha salarial de género ha sido y sigue siendo uno de los temas más relevantes en el ámbito laboral del país. De acuerdo con CASEN 2022 (BCN, 2023), los hombres perciben en promedio un 16% más que las mujeres. A nivel regional, las diferencias son heterogéneas, con zonas que exhiben brechas muy superiores o inferiores al promedio nacional.</p>
         </div>
 
         <div class="sections">
@@ -158,12 +164,16 @@
     </div>
   </div>
 
+  <footer>
+  <p>Fuentes: <a href="https://www.bcn.cl/asesoriasparlamentarias/detalle_documento.html?id=82907">Biblioteca del Congreso Nacional de Chile</a> - <a href="https://www.ine.gob.cl/estadisticas/sociales/ingresos-y-gastos/encuesta-suplementaria-de-ingresos"> INE: Encuesta Suplementaria de Ingresos</a></p>
+  <p>Desarrollado por: Xavier Morales, Fernando Navia e Ignacio Schatzke</p>
+  </footer>
+
   <!-- Tu JS existente para dibujar mapa y barras puede ir aquí -->
   <!-- Plotly.newPlot('mapa', ...) y buildStackedBars('chartDisparejos', ...), etc. -->
 
 </body>
 </html>
-
 
   <script>
     // ====================
@@ -300,7 +310,7 @@
           orientation: 'h',
           x: 0.5, xanchor: 'center',
           y: -0.12, yanchor: 'top',   // << debajo del mapa
-          title: { text: "", side: "top" }, // sin título aquí
+          title: { text: "Brecha Salarial (%)", side: "top" },
           len: 0.6, thickness: 15,
           tickmode: 'array',
           tickvals: [7.5, 12.5, 17.5, 22.5, 27.5, 32.5],
