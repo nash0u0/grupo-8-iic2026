@@ -12,6 +12,7 @@
       --text-main: #111827;
       --bg: #EDEDED;
     }
+    *{ box-sizing: border-box; }
     body{
       font-family: Arial, sans-serif;
       background: var(--bg);
@@ -23,9 +24,10 @@
       margin: 0 auto;
       padding: 16px;
     }
+
     .headline{
-      text-align: center;
-      margin: 8px 0 12px;
+      text-align: center;       /* título a la izquierda */
+      margin: 8px 0 16px;
       line-height: 1.12;
     }
     .headline h1{
@@ -37,21 +39,30 @@
     .headline h1 b{ font-weight: 600; }
     .headline .accent{ color: var(--accent); }
 
-    /* Mapa + texto en dos columnas */
-    .main{
+    /* === SPLIT IZQUIERDA / DERECHA === */
+    .split{
       display: flex;
       gap: 18px;
       align-items: flex-start;
     }
-    #mapa{
+    .left{
       flex: 1 1 58%;
+      min-width: 0; /* evita overflow */
+    }
+    .right{
+      flex: 1 1 42%;
+      min-width: 0;
+    }
+
+    /* Contenido específico */
+    #mapa{
+      width: 100%;
       height: 600px;
       background: var(--bg);
       border-radius: 8px;
     }
     .desc{
-      flex: 1 1 42%;
-      padding: 8px 12px;
+      padding: 8px 12px 0 12px;
       text-align: justify;
       font-size: clamp(14px, 1.6vw, 18px);
       line-height: 1.55;
@@ -59,71 +70,109 @@
     }
     .desc p{ margin: 0 0 10px; }
 
-    /* Dos contenedores de barras lado a lado */
-    .bars{
-      display: flex;
-      gap: 18px;
-      margin-top: 16px;
+    .sections{ margin-top: 18px; }
+    .section{ margin: 18px 0; }
+    .section h3{
+      margin: 0 0 6px;
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--text-main);
     }
-    #barsLeft{
-      flex: 1 1 50%;
-      height: 200px;
-      background: var(--bg);
-      border-radius: 8px;
+    .section hr{
+      border: none;
+      border-top: 1px solid #cfcfcf;
     }
-    #barsRight{
-      flex: 1 1 50%;
-      height: 150px;
+    .chart{
+      height: 180px;    /* ajusta para hacer barras más flacas/gruesas */
       background: var(--bg);
-      border-radius: 8px;
+      border-radius: 6px;
+      
+    }
+
+    #chartDisparejos.chart{
+      height: 180px;    /* ajusta para hacer barras más flacas/gruesas */
+      background: var(--bg);
+
+    }
+    #chartCapital.chart{ height: 60px; }
+
+    /* Responsive: apilar en pantallas pequeñas */
+    @media (max-width: 992px){
+      .split{ flex-direction: column; }
+      #mapa{ height: 480px; }
+    }
+    @media (max-width: 600px){
+      #mapa{ height: 380px; }
+      .chart{ height: 150px; }
+      #chartCapital.chart{ height: 56px; }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="headline">
-      <h1>
-        Regiones con la<br>
-        <b>Brecha Salarial</b><br>
-        <span class="accent"><b>Más Alta</b></span>
-      </h1>
-    </div>
 
-    <div class="main">
-      <div id="mapa"></div>
-      <div class="desc">
-        <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile, al ser un país metropolitano, no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos regionales alteran los datos de la capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
-        <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género y cómo existen patrones más definidos por zonas del país.</p>
+    <!-- IZQUIERDA / DERECHA -->
+    <div class="split">
+      <!-- Columna izquierda -->
+      <div class="left">
+        <div class="headline">
+          <h1>
+            Regiones con la<br>
+            <b>Brecha Salarial</b><br>
+            <span class="accent"><b>Más Alta</b></span>
+          </h1>
+        </div>
+        <div class="desc">
+          <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género (a favor de los hombres) y cómo existen patrones más definidos por zonas del país.</p>
+        </div>
+        <div id="mapa"></div>
       </div>
-    </div>
 
-    <!-- Barras en dos bloques -->
-    <div class="bars">
-      <div id="barsLeft"></div>
-      <div id="barsRight"></div>
+      <!-- Columna derecha -->
+      <div class="right">
+        <div class="desc">
+          <br></br>
+          <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile, al ser un país metropolitano, no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos regionales alteran los datos de la capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
+        </div>
+
+        <div class="sections">
+          <div class="section" id="secDisparejos">
+            <h3>Brechas más altas</h3>
+            <hr>
+            <div id="chartDisparejos" class="chart"></div>
+          </div>
+
+          <div class="section" id="secCapital">
+            <h3>Brecha de la capital</h3>
+            <hr>
+            <div id="chartCapital" class="chart"></div>
+          </div>
+
+          <div class="section" id="secParejos">
+            <h3>Brechas más bajas</h3>
+            <hr>
+            <div id="chartParejos" class="chart"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Tu JS existente para dibujar mapa y barras puede ir aquí -->
+  <!-- Plotly.newPlot('mapa', ...) y buildStackedBars('chartDisparejos', ...), etc. -->
+
+</body>
+</html>
+
+
   <script>
     // ====================
-    // BARRAS
+    // Utilidades BARRAS
     // ====================
-    const MAXIMO = 38;
-
-    // Top 3 + RM (desc): Antofagasta, Atacama, Magallanes, Metropolitana
-    const regionesLeft  = ['Metropolitana ','Magallanes ', 'Atacama ','Antofagasta '];
-    const valoresLeft   = [16.7, 24.3, 29.2, 33.9];
-
-    // 3 menores (desc): Araucanía, Maule, Ñuble
-    const regionesRight = ['Ñuble ','Maule ','Araucanía '];
-    const valoresRight  = [4.8, 9.1, 11.8];
-
-    const colores = ['#b30000','#d7301f','#ef6548','#fc8d59','#fdbb84','#fdd49e','#fdd49e'];
-
+    const MAXIMO = 40; // límite superior visual
     function buildStackedBars(divId, regiones, valores){
       const relleno = valores.map(v => Math.max(0, MAXIMO - v));
 
-      // tramo coloreado (valor real)
       const traceValor = {
         x: valores,
         y: regiones,
@@ -137,45 +186,43 @@
             if (v >= 15) return '#fc8d59';
             if (v >= 10) return '#fdbb84';
             return '#fdd49e';
-          }),
+          })
         },
         hovertemplate: '%{y}: %{x:.1f}%<extra></extra>',
         showlegend: false
       };
 
-      // tramo gris con texto (hasta 35)
       const traceRelleno = {
         x: relleno,
         y: regiones,
         type: 'bar',
         orientation: 'h',
         marker: { color: 'rgba(0,0,0,0.15)' },
-        text: valores.map(v => v.toFixed(1) + '%'),
+        text: valores.map(v => '<b>' + v.toFixed(1) + '%</b>' ),
         textposition: 'inside',
         insidetextanchor: 'middle',
         textfont: { color: '#111827', size: 12 },
         hoverinfo: 'skip',
-        showlegend: false,
+        showlegend: false
       };
 
       const layout = {
         barmode: 'stack',
+        bargap: 0.5,
+        bargroupgap: 0.3,
         xaxis: {
           range: [0, MAXIMO],
-          showticklabels: false,  // sin índices del eje X
+          showticklabels: false,
           ticks: '',
           showgrid: false,
-          zeroline: false,
-          bargap: 0.5,
-          bargroupgap: 0.3
+          zeroline: false
         },
         yaxis: {
           automargin: true,
-          ticks: '',              // sin pequeñas marcas
-          tickfont: { size: 14 },
-          // "Padding" extra: margen izquierdo amplio
+          ticks: '',
+          tickfont: { size: 14 }
         },
-        margin: { l: 180, r: 20, t: 8, b: 8 }, // más espacio para nombres
+        margin: { l: 180, r: 20, t: 8, b: 8 },
         paper_bgcolor: '#EDEDED',
         plot_bgcolor: '#EDEDED',
         showlegend: false
@@ -184,8 +231,25 @@
       Plotly.newPlot(divId, [traceValor, traceRelleno], layout, {staticPlot: true});
     }
 
-    buildStackedBars('barsLeft',  regionesLeft,  valoresLeft);
-    buildStackedBars('barsRight', regionesRight, valoresRight);
+    // ====================
+    // Datos por sección
+    // ====================
+    // 3 más disparejos (orden: Antofagasta, Atacama, Magallanes)
+    const regDisparejos = ['<b>3°</b>     Magallanes ', '<b>2°</b>        Atacama ', '<b>1°</b>   Antofagasta '];
+    const valDisparejos = [24.3, 29.2, 33.9];
+
+    // Capital
+    const regCapital = ['<b>11°</b> Metropolitana '];
+    const valCapital = [16.7];
+
+    // 3 más parejos (orden: Araucanía, Maule, Ñuble)
+    const regParejos = ['<b>15°</b>            Ñuble ', '<b>14°</b>            Maule ', '<b>13°</b>      Araucanía '];
+    const valParejos = [4.8, 9.1, 11.8];
+
+    // Render de las tres secciones
+    buildStackedBars('chartDisparejos', regDisparejos, valDisparejos);
+    buildStackedBars('chartCapital', regCapital, valCapital);
+    buildStackedBars('chartParejos', regParejos, valParejos);
 
     // ====================
     // MAPA
@@ -231,11 +295,12 @@
         zmax: 35,
         colorscale: colorscale,
         marker: { line: { color: 'black', width: 0.2 } },
+        // ↓ dejamos la escala activa, pero la movemos debajo del mapa
         colorbar: {
           orientation: 'h',
           x: 0.5, xanchor: 'center',
-          y: 1.15, yanchor: 'top',
-          title: { text: "Brecha Salarial (%)", side: "top" },
+          y: -0.12, yanchor: 'top',   // << debajo del mapa
+          title: { text: "", side: "top" }, // sin título aquí
           len: 0.6, thickness: 15,
           tickmode: 'array',
           tickvals: [7.5, 12.5, 17.5, 22.5, 27.5, 32.5],
@@ -244,7 +309,7 @@
       }];
 
       var layout = {
-        margin: { t: 0, b: 0, l: 0, r: 0 },
+        margin: { t: 0, b: 60, l: 0, r: 0 }, // más bottom para que quepa la escala
         paper_bgcolor: '#EDEDED',
         geo: {
           scope: 'south america',
@@ -256,7 +321,18 @@
           countrycolor: '#EDEDED',
           bgcolor: '#EDEDED'
         },
+        // === (1) Texto en la misma posición donde estaba la escala antes ===
         annotations: [
+          {
+            x: 0.5, y: 1.15,
+            xref: 'paper', yref: 'paper',
+            text: 'Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género y cómo existen patrones más definidos por zonas del país.',
+            showarrow: false,
+            font: { size: 14, color: '#111827' },
+            align: 'center',
+            bgcolor: 'rgba(255,255,255,0.0)',
+            borderpad: 4
+          },
           {
             x: 0.51, y: 0.86,
             xref: 'paper', yref: 'paper',
@@ -276,7 +352,7 @@
             x: 0.48, y: 0.58,
             xref: 'paper', yref: 'paper',
             ax: -170, ay: 0,
-            text: 'La Región de <b>Ñuble</b><br>registra la menor<br>brecha (4,8%),<br>aunque con <b>medianas<br>de ingreso</b> de<br>las más bajas<br>del país, lo que<br>evidencia que una<br> menor desigualdad<br>no necesariamente<br>implica mejores<br>condiciones económicas',
+            text: 'La Región de <b>Ñuble</b><br>registra la menor<br>brecha <b>(4,8%)</b>, lo cual se <br>debe a que esta es una de las <br>regiones con los salarios más <br> bajos en Chile, disminuyendo <br>las diferencias entre <br> hombres y mujeres, además <br>de no tener trabajos <br> altamente masculinizados <br>como minería o finanzas.',
             showarrow: true,
             font: { size: 12, color: 'black' },
             bgcolor: '#EDEDED',
