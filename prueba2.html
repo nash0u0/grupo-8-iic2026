@@ -1,204 +1,297 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Choropleth de Chile por Región</title>
+  <meta charset="UTF-8" />
+  <title>Brecha Salarial por Región</title>
   <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
-  <style>
-    #mapa {
-        width: 80%;
-        max-width: 800px;
-        height: 600px;
-        margin: 0 auto; /* centra horizontalmente */
-    }
 
-  </style>
   <style>
+    :root{
+      --accent: #b30000;
+      --text-main: #111827;
+      --bg: #EDEDED;
+    }
     body{
       font-family: Arial, sans-serif;
-      background-color: #EDEDED;
+      background: var(--bg);
+      color: var(--text-main);
+      margin: 0;
     }
-
-    :root{
-      --accent: #b30000;      /* color de acento (rojo) */
-      --text-main: #111827;   /* casi negro */
+    .page{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
     }
-
     .headline{
-      text-align: center;
-      margin: 16px 0 8px;
+      text-align: left;
+      margin: 8px 0 12px;
       line-height: 1.12;
-      font-family: Arial, sans-serif;
     }
-
     .headline h1{
       margin: 0;
       font-size: clamp(28px, 5vw, 44px);
-      font-weight: 150;                 /* base más liviana */
+      font-weight: 150;
       color: var(--text-main);
     }
+    .headline h1 b{ font-weight: 600; }
+    .headline .accent{ color: var(--accent); }
 
-    /* Aquí sí se nota el <b> dentro del h1 */
-    .headline h1 b,
-    .headline h1 strong{
-      font-weight: 600;                 /* más pesado que el base */
+    /* Mapa + texto en dos columnas */
+    .main{
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
     }
-
-    .headline .accent{
-      color: var(--accent);
+    #mapa{
+      flex: 1 1 58%;
+      height: 600px;
+      background: var(--bg);
+      border-radius: 8px;
     }
-</style>
+    .desc{
+      flex: 1 1 42%;
+      padding: 8px 12px;
+      text-align: justify;
+      font-size: clamp(14px, 1.6vw, 18px);
+      line-height: 1.55;
+      color: #374151;
+    }
+    .desc p{ margin: 0 0 10px; }
 
-<style>
-  .desc{
-    max-width: 900px;
-    margin: 10px auto 22px;
-    padding: 0 12px;
-    text-align: justify;
-    font-size: clamp(14px, 1.6vw, 18px);
-    line-height: 1.55;
-    color: #374151; /* gris oscuro legible */
-  }
-  .desc p{ margin: 100 0 10px; }
-  
-</style>
-
+    /* Dos contenedores de barras lado a lado */
+    .bars{
+      display: flex;
+      gap: 18px;
+      margin-top: 16px;
+    }
+    #barsLeft{
+      flex: 1 1 50%;
+      height: 200px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+    #barsRight{
+      flex: 1 1 50%;
+      height: 150px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-  <div class="headline">
-    <h1>
-      Regiones con la<br>
-      <b>Brecha Salarial</b><br>
-      <span class="accent"><b>Más Alta</b></span>
-    </h1>
+  <div class="page">
+    <div class="headline">
+      <h1>
+        Regiones con la<br>
+        <b>Brecha Salarial</b><br>
+        <span class="accent"><b>Más Alta</b></span>
+      </h1>
+    </div>
+
+    <div class="main">
+      <div id="mapa"></div>
+      <div class="desc">
+        <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile, al ser un país metropolitano, no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos regionales alteran los datos de la capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
+        <p>Por ejemplo, la Región de Antofagasta presenta la mayor diferencia, alcanzando un 33,9%, debido a la alta presencia de sectores mineros extractivos, altamente masculinizados y de altos salarios. En contraste, la Región de Ñuble registra la menor brecha (4,8%), aunque con medianas de ingreso de las más bajas del país, lo que evidencia que una menor desigualdad no necesariamente implica mejores condiciones económicas.</p>
+        <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género y cómo existen patrones más definidos por zonas del país.</p>
+      </div>
+    </div>
+
+    <!-- Barras en dos bloques -->
+    <div class="bars">
+      <div id="barsLeft"></div>
+      <div id="barsRight"></div>
+    </div>
   </div>
-
-  <div class="desc">
-    <p>La brecha salarial de género en Chile sigue siendo una realidad que refleja desigualdades estructurales en el mercado laboral. Chile al ser un país metropolitano no siempre es representativo con sus datos estadísticos generales, por lo que muchas veces los comportamientos de las regiones alteran los datos extraídos de la tan poblada capital. Según la CASEN 2022, analizada por la Biblioteca del Congreso Nacional (BCN, 2023), los hombres perciben en promedio un 16% más de ingresos por trabajo que las mujeres a nivel nacional.</p>
-    <p>Por ejemplo, la Región de Antofagasta presenta la mayor diferencia, alcanzando un 33,9%, debido a la alta presencia de sectores mineros extractivos, altamente masculinizados y de altos salarios. En contraste con la Región de Ñuble registra la menor brecha (4,8%), aunque con medianas de ingreso de las más bajas del país, lo que evidencia que una menor desigualdad no necesariamente implica mejores condiciones económicas.</p>
-    <p>Este proyecto busca visibilizar las diferencias territoriales en la brecha salarial de género y como hay comportamientos mas definidos por las distintas zonas Chilenas.</p>
-  </div>
-
-
-  <div id="mapa"></div>
 
   <script>
+    // ====================
+    // BARRAS
+    // ====================
+    const MAXIMO = 38;
+
+    // Top 3 + RM (desc): Antofagasta, Atacama, Magallanes, Metropolitana
+    const regionesLeft  = ['Metropolitana','Magallanes', 'Atacama','Antofagasta'];
+    const valoresLeft   = [16.7, 24.3, 29.2, 33.9];
+
+    // 3 menores (desc): Araucanía, Maule, Ñuble
+    const regionesRight = ['Ñuble','Maule','Araucanía'];
+    const valoresRight  = [4.8, 9.1, 11.8];
+
+    const colores = ['#b30000','#d7301f','#ef6548','#fc8d59','#fdbb84','#fdd49e','#fdd49e'];
+
+    function buildStackedBars(divId, regiones, valores){
+      const relleno = valores.map(v => Math.max(0, MAXIMO - v));
+
+      // tramo coloreado (valor real)
+      const traceValor = {
+        x: valores,
+        y: regiones,
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+          color: valores.map(v => {
+            if (v >= 30) return '#b30000';
+            if (v >= 25) return '#d7301f';
+            if (v >= 20) return '#ef6548';
+            if (v >= 15) return '#fc8d59';
+            if (v >= 10) return '#fdbb84';
+            return '#fdd49e';
+          }),
+        },
+        hovertemplate: '%{y}: %{x:.1f}%<extra></extra>',
+        showlegend: false
+      };
+
+      // tramo gris con texto (hasta 35)
+      const traceRelleno = {
+        x: relleno,
+        y: regiones,
+        type: 'bar',
+        orientation: 'h',
+        marker: { color: 'rgba(0,0,0,0.15)' },
+        text: valores.map(v => v.toFixed(1) + '%'),
+        textposition: 'inside',
+        insidetextanchor: 'middle',
+        textfont: { color: '#111827', size: 12 },
+        hoverinfo: 'skip',
+        showlegend: false,
+      };
+
+      const layout = {
+        barmode: 'stack',
+        xaxis: {
+          range: [0, MAXIMO],
+          showticklabels: false,  // sin índices del eje X
+          ticks: '',
+          showgrid: false,
+          zeroline: false,
+          bargap: 0.5,
+          bargroupgap: 0.3
+        },
+        yaxis: {
+          automargin: true,
+          ticks: '',              // sin pequeñas marcas
+          tickfont: { size: 14 },
+          // "Padding" extra: margen izquierdo amplio
+        },
+        margin: { l: 180, r: 20, t: 8, b: 8 }, // más espacio para nombres
+        paper_bgcolor: '#EDEDED',
+        plot_bgcolor: '#EDEDED',
+        showlegend: false
+      };
+
+      Plotly.newPlot(divId, [traceValor, traceRelleno], layout, {staticPlot: true});
+    }
+
+    buildStackedBars('barsLeft',  regionesLeft,  valoresLeft);
+    buildStackedBars('barsRight', regionesRight, valoresRight);
+
+    // ====================
+    // MAPA
+    // ====================
     const geojson_url = "https://raw.githubusercontent.com/caracena/chile-geojson/master/regiones.json";
 
     d3.json(geojson_url).then(function(geojson) {
-        geojson.features.forEach(x => {
-          if (x.properties.Region.startsWith("Región del ")) {
-            x.properties.Region = x.properties.Region.slice(11);
-          } else {
-            x.properties.Region = x.properties.Region.slice(10);
-          }
-        });
-        const locations = geojson.features.map(f => f.properties.Region);
-        const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2];
-        const breaks = [5, 10, 15, 20, 25, 30, 35]; // límites de clase
-        const colors = ['#fdd49e', '#fdbb84', '#fc8d59', '#ef6548', '#d7301f', '#b30000']; // OrRd[6]
+      geojson.features.forEach(x => {
+        if (x.properties.Region.startsWith("Región del ")) {
+          x.properties.Region = x.properties.Region.slice(11);
+        } else {
+          x.properties.Region = x.properties.Region.slice(10);
+        }
+      });
 
-        function steppedColorscale(breaks, colors) {
+      const locations = geojson.features.map(f => f.properties.Region);
+      const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2];
+      const breaks = [5, 10, 15, 20, 25, 30, 35];
+      const colors = ['#fdd49e', '#fdbb84', '#fc8d59', '#ef6548', '#d7301f', '#b30000'];
+
+      function steppedColorscale(breaks, colors) {
         const zmin = breaks[0], zmax = breaks[breaks.length - 1];
         const scale = [];
         for (let i = 0; i < colors.length; i++) {
           const v0 = breaks[i], v1 = breaks[i + 1];
           const t0 = (v0 - zmin) / (zmax - zmin);
           const t1 = (v1 - zmin) / (zmax - zmin);
-          // duplicamos cada frontera para que el color sea “a escalón”
           scale.push([t0, colors[i]]);
           scale.push([t1, colors[i]]);
         }
         return scale;
+      }
+
+      const colorscale = steppedColorscale(breaks, colors);
+
+      var data = [{
+        type: 'choropleth',
+        geojson: geojson,
+        locations: locations,
+        z: z,
+        featureidkey: 'properties.Region',
+        zmin: 5,
+        zmax: 35,
+        colorscale: colorscale,
+        marker: { line: { color: 'black', width: 0.2 } },
+        colorbar: {
+          orientation: 'h',
+          x: 0.5, xanchor: 'center',
+          y: 1.15, yanchor: 'top',
+          title: { text: "Brecha Salarial (%)", side: "top" },
+          len: 0.6, thickness: 15,
+          tickmode: 'array',
+          tickvals: [7.5, 12.5, 17.5, 22.5, 27.5, 32.5],
+          ticktext: ['5-10', '10-15', '15-20', '20-25', '25-30', '30-35']
         }
+      }];
 
-        const colorscale = steppedColorscale(breaks, colors);
-
-        var data = [{
-          type: 'choropleth',
-          geojson: geojson,
-          locations: locations, // ids de cada región en tu geojson
-          z: z, // valores por región (este hara que cambie el tono de cada region)
-          featureidkey: 'properties.Region', // depende de cómo se llama el campo en tu geojson
-          zmin: 5,
-          zmax: 35,
-          colorscale: colorscale,
-          marker: {
-            line: {
-              color: 'black',
-              width: 0.2
-            }
+      var layout = {
+        margin: { t: 0, b: 0, l: 0, r: 0 },
+        paper_bgcolor: '#EDEDED',
+        geo: {
+          scope: 'south america',
+          center: { lon: -70, lat: -40 },
+          projection: { type: 'mercator', scale: 1.7 },
+          showland: false,
+          landcolor: 'lightgray',
+          showcountries: true,
+          countrycolor: '#EDEDED',
+          bgcolor: '#EDEDED'
+        },
+        annotations: [
+          {
+            x: 0.52, y: 0.86,
+            xref: 'paper', yref: 'paper',
+            ax: 200, ay: 0,
+            text: 'Región de Antofagasta <br><b>(33.9%)</b>',
+            showarrow: true,
+            font: { size: 18, color: 'black' },
+            bgcolor: '#EDEDED',
+            bordercolor: 'black',
+            borderwidth: 1,
+            borderpad: 5,
+            arrowhead: 0,
+            arrowwidth: 1,
+            arrowcolor: 'black'
           },
-          colorbar: {
-            orientation: 'h',   // horizontal
-            x: 0.5,             // centro en eje X
-            xanchor: 'center', // anclar al centro
-            y: 1.15,             // debajo del gráfico
-            yanchor: 'top',
-            title: {
-              text: "Brecha Salarial (%)",
-              side: "top",
-            },
-            len: 0.6,
-            thickness: 15,
-            tickmode: 'array',
-            tickvals: [7.5, 12.5, 17.5, 22.5, 27.5, 32.5],
-            ticktext: ['5-10', '10-15', '15-20', '20-25', '25-30', '30-35']
+          {
+            x: 0.48, y: 0.58,
+            xref: 'paper', yref: 'paper',
+            ax: -170, ay: 0,
+            text: 'Región de Ñuble <br><b>(4.8%)</b>',
+            showarrow: true,
+            font: { size: 18, color: 'black' },
+            bgcolor: '#EDEDED',
+            bordercolor: 'black',
+            borderwidth: 1,
+            borderpad: 5,
+            arrowhead: 0,
+            arrowwidth: 1,
+            arrowcolor: 'black'
           }
-        }];
+        ]
+      };
 
-        var layout = {
-            margin: { t: 0, b: 0, l: 0, r: 0 },
-            paper_bgcolor: '#EDEDED', // transparente
-            geo: {
-                scope: 'south america', // opcional, ayuda a recortar un poco el mapa
-                center: { lon: -70, lat: -40 }, // longitud y latitud del centro de Chile
-                projection: {
-                    type: 'mercator', // puedes usar 'natural earth', 'orthographic', etc.
-                    scale: 1.7 // cuanto mayor, más cerca (zoom)
-                },
-                showland: false, // false deja solo Chile!!
-                landcolor: 'lightgray',
-                showcountries: true,
-                countrycolor: '#EDEDED',
-                bgcolor: '#EDEDED' // transparente
-            },
-            annotations: [
-              {
-                x: 0.52, y: 0.86,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
-                xref: 'paper', yref: 'paper',
-                ax: 200, ay: 0,
-                text: 'Región de Antofagasta <br><b>(33.9%)</b>',
-                showarrow: true,
-                font: { size: 18, color: 'black' },
-                bgcolor: '#EDEDED', // fondo semi-transparente
-                bordercolor: 'black',
-                borderwidth: 1,
-                borderpad: 5,
-                arrowhead: 0,
-                arrowwidth: 1,
-                arrowcolor: 'black'
-              },
-              {
-                x: 0.48, y: 0.58,               // posición (paper coords: 0 = izq/abajo, 1 = der/arriba)
-                xref: 'paper', yref: 'paper',
-                ax: -170, ay: 0,
-                text: 'Región de Ñuble <br><b>(4.8%)</b>',
-                showarrow: true,
-                font: { size: 18, color: 'black' },
-                bgcolor: '#EDEDED', // fondo semi-transparente
-                bordercolor: 'black',
-                borderwidth: 1,
-                borderpad: 5,
-                arrowhead: 0,
-                arrowwidth: 1,
-                arrowcolor: 'black'
-              }
-            ]
-        };
-
-        Plotly.newPlot('mapa', data, layout, { staticPlot: true });
+      Plotly.newPlot('mapa', data, layout, { staticPlot: true });
     });
   </script>
 </body>
