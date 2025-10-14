@@ -70,7 +70,7 @@
     }
     .desc p{ margin: 0 0 10px; }
 
-    .sections{ margin-top: 18px; }
+    .sections{ margin-top: 18px; display: block;}
     .section{ margin: 18px 0; }
     .section h3{
       margin: 0 0 6px;
@@ -140,8 +140,11 @@
 
       <!-- Columna derecha -->
       <div class="right">
-
-        <div class="sections">
+        <div id="info-box", style="display: none;">
+          <h4 id="region-name"></h4>
+          <p id="region-info"></p>
+        </div>
+        <div id="right-info", class="sections">
           <div class="section" id="secDisparejos">
             <h3>Brechas más altas</h3>
             <hr>
@@ -161,10 +164,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div id="info-box">
-      <h4 id="region-name"></h4>
-      <p id="region-info"></p>
     </div>
   </div>
 
@@ -411,7 +410,7 @@
 
       Plotly.newPlot('mapa', data, layout, { displayModeBar: false });
 
-      selectedRegion = null;
+      var selectedRegion = null;
       document.getElementById("mapa").on("plotly_click", function (data) {
         console.log(data.points[0]);
         const region = data.points[0].location;
@@ -422,6 +421,8 @@
 
         if (selectedRegion === region) {
           selectedRegion = null;
+          document.getElementById("info-box").style.display = "none";
+          document.getElementById("right-info").style.display = "block";
         } else {
           selectedRegion = region;
         }
@@ -440,17 +441,23 @@
         });
 
       });
+
+      document.getElementById("mapa").addEventListener('click', function () {
+        selectedRegion = null;
+        Plotly.restyle('mapa', {
+          'marker.line.width': [[0.2]]
+        });
+        document.getElementById("info-box").style.display = "none";
+        document.getElementById("right-info").style.display = "block";
+      })
     });
 
     function change_info(region_info, brecha) {
+      document.getElementById("right-info").style.display = "none";
       if (region_info) {
         document.getElementById("region-name").innerText = region_info.id;
         document.getElementById("region-info").innerText = region_info.info;
         document.getElementById("info-box").style.display = "block";
-        setTimeout(function () {
-          document.getElementById("info-box").classList.add("visible");
-        }, 1000);
-
       }
     }
   </script>
