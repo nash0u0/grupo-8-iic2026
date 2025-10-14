@@ -289,8 +289,8 @@
       })
       // -------------------------------------------------------------------
       // Aca se pone la info de cada region
-      // info_regiones[0].info = "algo";
-      // info_regiones[1].info = "algo";
+      info_regiones[0].info = "Mediana ingreso del trabajo: H -> $500.000 M -> $400.000";
+      info_regiones[1].info = "zana gei";
       // info_regiones[2].info = "algo";
       // info_regiones[3].info = "algo";
       // info_regiones[4].info = "algo";
@@ -362,6 +362,9 @@
           countrycolor: '#EDEDED',
           bgcolor: '#EDEDED'
         },
+        dragmode: false,
+        scrollZoom: false,
+        doubleClick: false,
         annotations: [
           {
             x: 0.5, y: 1.15,
@@ -408,13 +411,34 @@
 
       Plotly.newPlot('mapa', data, layout, { displayModeBar: false });
 
+      selectedRegion = null;
       document.getElementById("mapa").on("plotly_click", function (data) {
-        console.log(data);
+        console.log(data.points[0]);
         const region = data.points[0].location;
         const brecha = data.points[0].z;
         const region_info = info_regiones.find((reg) => reg.id == region);
         console.log("clickeaste: ", region);
         change_info(region_info, brecha);
+
+        if (selectedRegion === region) {
+          selectedRegion = null;
+        } else {
+          selectedRegion = region;
+        }
+
+        // var newLineColors = locations.map(loc =>
+        //   loc === selectedRegion ? 'white' : 'black'  // borde negro si está seleccionada
+        // );
+        var newLineWidths = locations.map(loc =>
+          loc === selectedRegion ? 2 : 0.2  // más grueso si está seleccionada
+        );
+
+        // Actualizamos el gráfico
+        Plotly.restyle('mapa', {
+          // 'marker.line.color': [newLineColors],
+          'marker.line.width': [newLineWidths]
+        });
+
       });
     });
 
