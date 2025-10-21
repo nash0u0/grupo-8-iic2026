@@ -10,7 +10,7 @@
     :root{
       --accent: #b30000;
       --text-main: #111827;
-      --bg: #EDEDED;
+      --bg: #ffffff;
       --card: #ffffff;
       --muted: #6b7280;
       --border: #e5e7eb;
@@ -245,8 +245,8 @@
         xaxis: { range: [0, MAXIMO], showticklabels: false, ticks: '', showgrid: false, zeroline: false },
         yaxis: { automargin: true, ticks: '', tickfont: { size: 14 } },
         margin: { l: 180, r: 20, t: 8, b: 8 },
-        paper_bgcolor: '#EDEDED',
-        plot_bgcolor: '#EDEDED',
+        paper_bgcolor: '#ffffff',
+        plot_bgcolor: '#ffffff',
         showlegend: false
       };
 
@@ -295,9 +295,8 @@
       const trace = {
         x, y,
         type: 'bar',
-        text: y.map(v => (v!=null && !isNaN(v)) ? `${v.toFixed(1)}` : ''),
+        text: y.map(v => (v!=null && !isNaN(v)) ? `$${v}` : ''),
         textposition: 'auto',
-        hovertemplate: '{x}: {y}<extra></extra>',
         marker: { color: ['#b30000', '#ef6548', '#fc8d59', '#fdbb84', '#fdd49e'] },
         hoverinfo: 'none'
       };
@@ -305,10 +304,11 @@
       const layout = {
         title: { text: title, font: { size: 14 } },
         margin: { t: 30, r: 10, l: 40, b: 40 },
-        paper_bgcolor: '#EDEDED',
-        plot_bgcolor: '#EDEDED',
-        yaxis: { rangemode: 'tozero', gridcolor: 'rgba(0,0,0,0.08)' },
-        xaxis: { tickangle: -20 }
+        paper_bgcolor: '#ffffff',
+        plot_bgcolor: '#ffffff',
+        yaxis: { rangemode: 'tozero', gridcolor: 'rgba(0,0,0,0)' },
+        xaxis: { tickangle: -20 },
+        dragmode: false
       };
 
       Plotly.newPlot(container, [trace], layout, {displayModeBar: false, responsive: true});
@@ -415,9 +415,9 @@
       buildInfoTable('panel-tbody', meta.rows);
 
       // NUEVO: dibujar el gráfico de barras del panel
+      showPanel();
       renderRegionBars(regionName, (typeof brecha === 'number') ? brecha : BRECHA_NACIONAL);
 
-      showPanel();
     }
 
     // Mapa + interacción
@@ -447,10 +447,10 @@
 
       const layout = {
         margin: { t: 0, b: 60, l: 0, r: 0 },
-        paper_bgcolor: '#EDEDED',
+        paper_bgcolor: '#ffffff',
         geo: {
           scope: 'south america', center: { lon: -70, lat: -40 }, projection: { type: 'mercator', scale: 1.7 },
-          showland: false, landcolor: 'lightgray', showcountries: true, countrycolor: '#EDEDED', bgcolor: '#EDEDED'
+          showland: false, landcolor: 'lightgray', showcountries: true, countrycolor: '#ffffff', bgcolor: '#ffffff'
         },
         dragmode: false, scrollZoom: false, doubleClick: false
       };
