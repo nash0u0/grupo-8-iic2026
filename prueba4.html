@@ -225,6 +225,21 @@
     // Utilidades BARRAS (listas)
     // ====================
     const MAXIMO = 40; // límite visual para los rankings
+    const audios = [
+      new Audio("audios/audio_0.mp3"),
+      new Audio("audios/audio_1.mp3"),
+      new Audio("audios/audio_2.mp3"),
+      new Audio("audios/audio_3.mp3"),
+      new Audio("audios/audio_4.mp3"),
+      new Audio("audios/audio_5.mp3"),
+      new Audio("audios/audio_6.mp3"),
+      new Audio("audios/audio_7.mp3"),
+      new Audio("audios/audio_8.mp3"),
+      new Audio("audios/audio_9.mp3"),
+    ];
+    audios[0].playbackRate=3;
+    let audioInterval;
+
     function buildStackedBars(divId, regiones, valores){
       const relleno = valores.map(v => Math.max(0, MAXIMO - v));
 
@@ -375,6 +390,8 @@
       }
     };
 
+    const max = Math.max(...Object.values(REGIONES_DATA).map(r => r.brecha));
+
     function canonicalKey(name) {
       if (REGIONES_DATA[name]) return name;
       for (const k in REGIONES_DATA) {
@@ -427,7 +444,11 @@
       document.getElementById('right-info').style.display = 'block';
       const pb = document.getElementById('panel-bar');
       if (pb) pb.innerHTML = '';
+      clearInterval(audioInterval);
+      audios[0].pause();
+      audios[0].currentTime = 0;
     }
+
     function buildInfoTable(tbodyId, rows){
       const tb = document.getElementById(tbodyId);
       tb.innerHTML = '';
@@ -527,16 +548,32 @@
           const original = baseColors.slice();
           gd.on('plotly_hover', (ev) => {
             const i = ev.points?.[0]?.pointNumber;
+            const value = ev.points?.[0]?.value;
             if (i == null) return;
             const newColors = original.slice();
             newColors[i] = '#000000';
             Plotly.restyle(gd, { 'marker.color': [newColors] });
-          });
+            console.log(ev.points?.[0].value);
+            
+            if (value < 420000) audio = audios[1];
+            else if (value < 440000) audio = audios[2];
+            else if (value < 460000) audio = audios[3];
+            else if (value < 480000) audio = audios[4];
+            else if (value < 500000) audio = audios[5];
+            else if (value < 550000) audio = audios[6];
+            else if (value < 600000) audio = audios[7];
+            else if (value <= 700000) audio = audios[8];
+            
+            audio.currentTime = 0; // Asegurarse de que empieza desde el inicio
+            audio.volume = 1; // Ajustar el volumen (si es necesario)
+            audio.play();
+
           gd.on('plotly_unhover', () => {
             Plotly.restyle(gd, { 'marker.color': [original] });
+            audio.pause();
           });
         });
-    }
+    })};
 
     function renderRegionPanel(regionName, brecha){
       const k = canonicalKey(regionName);
@@ -646,6 +683,25 @@
         const newLineWidths = locations.map(loc => loc === selectedRegion ? 2 : 0.2);
         Plotly.restyle('mapa', { 'marker.line.width': [newLineWidths] });
         renderRegionPanel(region, brecha);
+
+        audios[0].currentTime = 0; // Asegurarse de que empieza desde el inicio
+        audios[0].volume = 0.1; // Ajustar el volumen (si es necesario)
+        audios[0].play();
+
+        // Calcular el intervalo de repetición del audio basado en el consumo
+        const minInterval = 200; // Tiempo mínimo en ms entre repeticiones
+        const maxInterval = 1200; // Tiempo máximo en ms entre repeticiones
+        const interval =
+          maxInterval - (brecha / max) * (maxInterval - minInterval);
+
+        // Limpiar cualquier intervalo anterior para evitar superposición de audios
+        clearInterval(audioInterval);
+
+        // Iniciar el audio a intervalos específicos
+        audioInterval = setInterval(() => {
+          audios[0].currentTime = 0;
+          audios[0].play();
+        }, interval);
       });
 
       document.getElementById('panel-back').addEventListener('click', () => {
