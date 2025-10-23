@@ -95,15 +95,42 @@
       overflow: hidden;
       margin-bottom: 10px;
     }
-    .data-table caption{
-      text-align: left; font-weight: 600; padding: 8px 10px; background: #f9fafb; border-bottom: 1px solid var(--border);
-    }
     .data-table th, .data-table td{ padding: 8px 10px; border-bottom: 1px solid var(--border); }
-    .data-table th{ text-align: left; font-weight: 600; color: var(--muted); }
-    .data-table tr:nth-child(even){ background: #fafafa; }
     .y-label{ text-align: right; white-space: nowrap; width: 40%; color: #374151; }
 
-    #panel-bar{ height: 220px; background: var(--bg); border-radius: 6px; margin-top: 10px; }
+    /* === Iconos de empleos destacados === */
+    .jobs-grid{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      margin: 6px 0 14px;
+    }
+    .job{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--card);
+    }
+    .job img{
+      width: 48px; height: 48px;
+      object-fit: contain;
+      /* si tus SVG son negros, puedes atenuarlos con filter si quieres */
+      /* filter: grayscale(100%); */
+    }
+    .job figcaption{
+      font-size: 12px;
+      color: #374151;
+      text-align: center;
+      line-height: 1.2;
+    }
+    @media (max-width: 700px){
+      .jobs-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+
+    #panel-bar{ height: 220px; background: var(--bg); border-radius: 6px; margin-top: 6px; }
 
     .panel-actions{ display:flex; gap:8px; margin-top: 10px; }
     .btn{ cursor: pointer; border: 1px solid var(--border); background: #fff; padding: 6px 10px; border-radius: 8px; font-size: 13px; }
@@ -149,8 +176,11 @@
           <h3 id="panel-title">&nbsp;</h3>
           <div class="subtitle" id="panel-subtitle"></div>
           <p id="panel-text"></p>
+
+          <!-- NUEVO: iconos de empleos -->
+          <div id="panel-jobs" class="jobs-grid" aria-label="Empleos destacados"></div>
+
           <table class="data-table" id="panel-table">
-            <caption id="panel-table-caption">Indicadores</caption>
             <tbody id="panel-tbody"></tbody>
           </table>
 
@@ -351,7 +381,6 @@
         const item = REGIONES_DATA[k];
         if (item.aliases && item.aliases.includes(name)) return k;
       }
-      // quitar prefijos y normalizar espacios
       const soft = name
         .replace(/^Región\s+de\s+/i, "")
         .replace(/^Región\s+/i, "")
@@ -366,7 +395,7 @@
     }
 
     // ====================
-    // RANKINGS (usa datos reales)
+    // RANKINGS
     // ====================
     const regDisparejos = ['<b>3°</b> Magallanes ', '<b>2°</b> Atacama ', '<b>1°</b> Antofagasta '];
     const valDisparejos = [
@@ -374,17 +403,14 @@
       REGIONES_DATA["Atacama"].brecha,
       REGIONES_DATA["Antofagasta"].brecha
     ];
-
     const regCapital = ['Metropolitana '];
     const valCapital = [REGIONES_DATA["Metropolitana de Santiago"].brecha];
-
     const regParejos = ['<b>3°</b> La Araucanía ', '<b>2°</b> Maule ', '<b>1°</b> Ñuble '];
     const valParejos = [
       REGIONES_DATA["La Araucanía"].brecha,
       REGIONES_DATA["Maule"].brecha,
       REGIONES_DATA["Ñuble"].brecha
     ];
-
     buildStackedBars('chartDisparejos', regDisparejos, valDisparejos);
     buildStackedBars('chartCapital', regCapital, valCapital);
     buildStackedBars('chartParejos', regParejos, valParejos);
@@ -418,12 +444,48 @@
       });
     }
 
+    // === ICONOS: mapeo nombre -> archivo SVG (placeholders en ./icons/) ===
+    const ICONS_PATH = './icons';
+    const employmentIconMap = {
+      "Administración pública": "admin-publica.svg",
+      "Construcción": "construccion.svg",
+      "Comercio": "comercio.svg",
+      "Enseñanza": "ensenanza.svg",
+      "Transporte/almacenamiento": "transporte-almacenamiento.svg",
+      "Transporte": "transporte-almacenamiento.svg",
+      "Minería": "mineria.svg",
+      "Industrias manufactureras": "industrias-manufactureras.svg",
+      "Actividades silvoagropecuarias y pesca": "silvoagropecuarias-pesca.svg",
+      "Silvoagropecuarias y pesca": "silvoagropecuarias-pesca.svg"
+    };
+
+    function renderJobs(empleos){
+      const grid = document.getElementById('panel-jobs');
+      grid.innerHTML = '';
+      (empleos || []).forEach(nombre => {
+        const file = employmentIconMap[nombre] || 'placeholder.svg';
+        const fig = document.createElement('figure');
+        fig.className = 'job';
+
+        const img = document.createElement('img');
+        img.src = `${ICONS_PATH}/${file}`;
+        img.alt = nombre;
+        img.loading = 'lazy';
+
+        const cap = document.createElement('figcaption');
+        cap.textContent = nombre;
+
+        fig.appendChild(img);
+        fig.appendChild(cap);
+        grid.appendChild(fig);
+      });
+    }
+
     // ====================
     // Barras del panel: eje Y fijo en $1.000.000 y hover -> negro
     // ====================
     function renderRegionBars(regionName, brecha){
       const container = 'panel-bar';
-      // Encontrar la entrada por label mostrado
       const k = Object.keys(REGIONES_DATA).find(
         key => REGIONES_DATA[key].label === regionName
       ) || canonicalKey(regionName);
@@ -433,7 +495,7 @@
       const x = isMoney ? ["Hombres", "Mujeres"] : [regionName, "Nacional"];
       const y = isMoney ? [data.h, data.m] : [brecha, BRECHA_NACIONAL];
 
-      const baseColors = isMoney ? ['#b30000', '#ef6548'] : ['#b30000', '#ef6548'];
+      const baseColors = ['#b30000', '#ef6548'];
 
       const trace = {
         x, y, type: 'bar',
@@ -482,13 +544,10 @@
 
       const title = data ? data.label : regionName;
       const text = data
-        ? `Empleos destacados: ${data.empleos.join(", ")}.`
+        ? `Empleos destacados en la región.`
         : 'Descripción pendiente para esta región.';
       const rows = data
         ? [
-            ["Brecha salarial", `${data.brecha.toFixed(1)}%`],
-            ["Mediana ingreso (H)", `$${Number(data.h).toLocaleString("es-CL")}`],
-            ["Mediana ingreso (M)", `$${Number(data.m).toLocaleString("es-CL")}`],
           ]
         : [['Brecha salarial', `${(typeof brecha === 'number') ? brecha.toFixed(1) : brecha}`]];
 
@@ -496,9 +555,11 @@
       document.getElementById('panel-subtitle').textContent =
         `Brecha estimada: ${(data?.brecha ?? brecha).toFixed ? (data?.brecha ?? brecha).toFixed(1) : brecha}%`;
       document.getElementById('panel-text').textContent = text;
-      document.getElementById('panel-table-caption').textContent = 'Indicadores';
-      buildInfoTable('panel-tbody', rows);
 
+      // Renderizar iconos de empleos con subtítulo
+      renderJobs(data?.empleos || []);
+
+      buildInfoTable('panel-tbody', rows);
       showPanel();
       renderRegionBars(title, data?.brecha ?? (typeof brecha === 'number' ? brecha : BRECHA_NACIONAL));
     }
