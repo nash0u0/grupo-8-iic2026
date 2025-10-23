@@ -74,7 +74,7 @@
     .chart{ height: 180px; background: var(--bg); border-radius: 6px; }
     #chartCapital.chart{ height: 70px; }
 
-    /* === PANEL DE REGIÓN (Plantilla) === */
+    /* === PANEL DE REGIÓN === */
     .info-panel{
       display:none;
       background: var(--card);
@@ -101,10 +101,8 @@
     .data-table th, .data-table td{ padding: 8px 10px; border-bottom: 1px solid var(--border); }
     .data-table th{ text-align: left; font-weight: 600; color: var(--muted); }
     .data-table tr:nth-child(even){ background: #fafafa; }
-    /* Emular "eje Y": etiquetas alineadas a la derecha */
     .y-label{ text-align: right; white-space: nowrap; width: 40%; color: #374151; }
 
-    /* Contenedor del gráfico dentro del panel */
     #panel-bar{ height: 220px; background: var(--bg); border-radius: 6px; margin-top: 10px; }
 
     .panel-actions{ display:flex; gap:8px; margin-top: 10px; }
@@ -118,7 +116,6 @@
     @media (max-width: 600px){
       #mapa{ height: 380px; }
       .chart{ height: 150px; }
-      #chartCapital.chart{ height: 56px; }
       #panel-bar{ height: 200px; }
     }
 
@@ -141,14 +138,11 @@
       </div>
     </div>
 
-    <!-- IZQUIERDA / DERECHA -->
     <div class="split">
-      <!-- Columna izquierda -->
       <div class="left">
         <div id="mapa"></div>
       </div>
 
-      <!-- Columna derecha -->
       <div class="right">
         <!-- PANEL DINÁMICO -->
         <div id="info-panel" class="info-panel" role="region" aria-live="polite">
@@ -157,10 +151,9 @@
           <p id="panel-text"></p>
           <table class="data-table" id="panel-table">
             <caption id="panel-table-caption">Indicadores</caption>
-            <tbody id="panel-tbody"><!-- filas dinámicas --></tbody>
+            <tbody id="panel-tbody"></tbody>
           </table>
 
-          <!-- NUEVO: gráfico de barras al seleccionar región -->
           <div id="panel-bar"></div>
 
           <div class="panel-actions">
@@ -168,7 +161,7 @@
           </div>
         </div>
 
-        <!-- Contenido por defecto cuando no hay región seleccionada -->
+        <!-- Contenido por defecto -->
         <div id="right-info" class="sections">
           <div class="section" id="secDisparejos">
             <h3>Brechas más altas</h3>
@@ -201,7 +194,7 @@
     // ====================
     // Utilidades BARRAS (listas)
     // ====================
-    const MAXIMO = 40; // límite superior visual
+    const MAXIMO = 40; // límite visual para los rankings
     function buildStackedBars(divId, regiones, valores){
       const relleno = valores.map(v => Math.max(0, MAXIMO - v));
 
@@ -230,7 +223,7 @@
         type: 'bar',
         orientation: 'h',
         marker: { color: 'rgba(0,0,0,0.15)' },
-        text: valores.map(v => '<b>' + v.toFixed(1) + '</b>' ),
+        text: valores.map(v => '<b>' + v.toFixed(1) + '%</b>' ),
         textposition: 'inside',
         insidetextanchor: 'middle',
         textfont: { color: '#111827', size: 12 },
@@ -254,128 +247,151 @@
     }
 
     // ====================
-    // NUEVO: Datos para barras del panel por región
+    // DATOS DE REGIONES + ALIAS (para empatar con el GeoJSON)
     // ====================
-    // Si hay datos específicos por región, úsalos.
-    // Si no, se grafica comparación "Región vs Nacional (16%)".
     const BRECHA_NACIONAL = 16.0;
 
-    const regionBars = {
-      // Ejemplos (ajusta a tus datos reales)
-      'Región de Antofagasta': {
-        title: 'Composición sectorial del empleo',
-        categories: ['Hombres', 'Mujeres'],
-        values: [700000, 462500]
+    const REGIONES_DATA = {
+      // Norte
+      "Arica y Parinacota": {
+        label: "Arica y Parinacota",
+        brecha: 20.0, h: 500000, m: 400000,
+        empleos: ["Administración pública", "Construcción", "Comercio"]
       },
-      'Región de Ñuble': {
-        title: 'Composición sectorial del empleo (%)',
-        categories: ['Hombres', 'Mujeres'],
-        values: [28, 15, 45, 12]
+      "Tarapacá": {
+        label: "Tarapacá",
+        brecha: 23.6, h: 550000, m: 420000,
+        empleos: ["Comercio", "Enseñanza", "Transporte/almacenamiento"]
+      },
+      "Antofagasta": {
+        label: "Antofagasta",
+        brecha: 33.9, h: 700000, m: 462500,
+        empleos: ["Minería", "Comercio", "Transporte/almacenamiento"]
+      },
+      "Atacama": {
+        label: "Atacama",
+        brecha: 29.2, h: 600000, m: 425000,
+        empleos: ["Minería", "Comercio", "Industrias manufactureras"]
+      },
+      "Coquimbo": {
+        label: "Coquimbo",
+        brecha: 19.5, h: 500000, m: 402500,
+        empleos: ["Comercio", "Minería", "Enseñanza"]
+      },
+
+      // Centro
+      "Valparaíso": {
+        label: "Valparaíso",
+        brecha: 20.0, h: 500000, m: 400000,
+        empleos: ["Comercio", "Construcción", "Transporte"]
+      },
+      "Metropolitana de Santiago": {
+        label: "Metropolitana",
+        brecha: 16.7, h: 600000, m: 500000,
+        empleos: ["Comercio", "Construcción", "Industrias manufactureras"],
+        aliases: ["Metropolitana", "Región Metropolitana"]
+      },
+      "Región del Libertador Bernardo O'Higgins": {
+        label: "Libertador Bernardo O’Higgins",
+        brecha: 15.2, h: 500000, m: 424167,
+        empleos: ["Actividades silvoagropecuarias y pesca", "Comercio", "Industrias manufactureras"],
+        aliases: ["O’Higgins", "Libertador Bernardo O’Higgins"]
+      },
+      "Maule": {
+        label: "Maule",
+        brecha: 9.1, h: 440000, m: 400000,
+        empleos: ["Comercio", "Silvoagropecuarias y pesca", "Enseñanza"]
+      },
+      "Ñuble": {
+        label: "Ñuble",
+        brecha: 4.8, h: 420000, m: 400000,
+        empleos: ["Comercio", "Silvoagropecuarias y pesca", "Industrias manufactureras"]
+      },
+      "Región del Bío-Bío": {
+        label: "Región del Biobío",
+        brecha: 20.0, h: 500000, m: 400000,
+        empleos: ["Comercio", "Industrias manufactureras", "Enseñanza"]
+      },
+
+      // Sur
+      "La Araucanía": {
+        label: "La Araucanía",
+        brecha: 11.8, h: 430744, m: 380000,
+        empleos: ["Comercio", "Construcción", "Silvoagropecuarias y pesca"]
+      },
+      "Los Ríos": {
+        label: "Los Ríos",
+        brecha: 16.7, h: 480000, m: 400000,
+        empleos: ["Comercio", "Silvoagropecuarias y pesca", "Enseñanza"]
+      },
+      "Los Lagos": {
+        label: "Los Lagos",
+        brecha: 19.4, h: 500000, m: 402917,
+        empleos: ["Comercio", "Industrias manufactureras", "Silvoagropecuarias y pesca"]
+      },
+
+      // Austral
+      "Aysén del General Carlos Ibáñez del Campo": {
+        label: "Aysén",
+        brecha: 18.1, h: 610834, m: 500000,
+        empleos: ["Administración pública", "Comercio", "Construcción"],
+        aliases: ["Aysén"]
+      },
+      "Magallanes y de la Antártica Chilena": {
+        label: "Magallanes",
+        brecha: 24.3, h: 668500, m: 506250,
+        empleos: ["Comercio", "Administración pública", "Transporte"],
+        aliases: ["Magallanes"]
       }
-      // Agrega más regiones si tienes desgloses
     };
 
-    function renderRegionBars(regionName, brecha){
-      const container = 'panel-bar';
-      let title, x, y;
-      console.log(regionName);
-      console.log(regionBars);
-
-      if (regionBars[regionName]){
-        title = regionBars[regionName].title || `Indicadores de ${regionName}`;
-        x = regionBars[regionName].categories;
-        y = regionBars[regionName].values;
-      } else {
-        // fallback: comparación región vs nacional
-        title = 'Brecha Regional vs. Nacional';
-        x = [regionName, 'Nacional'];
-        y = [brecha, BRECHA_NACIONAL];
+    function canonicalKey(name) {
+      if (REGIONES_DATA[name]) return name;
+      for (const k in REGIONES_DATA) {
+        const item = REGIONES_DATA[k];
+        if (item.aliases && item.aliases.includes(name)) return k;
       }
-
-      const trace = {
-        x, y,
-        type: 'bar',
-        text: y.map(v => (v!=null && !isNaN(v)) ? `$${v}` : ''),
-        textposition: 'auto',
-        marker: { color: ['#b30000', '#ef6548', '#fc8d59', '#fdbb84', '#fdd49e'] },
-        hoverinfo: 'none'
-      };
-
-      const layout = {
-        title: { text: title, font: { size: 14 } },
-        margin: { t: 30, r: 10, l: 40, b: 40 },
-        paper_bgcolor: '#ffffff',
-        plot_bgcolor: '#ffffff',
-        yaxis: { rangemode: 'tozero', gridcolor: 'rgba(0,0,0,0)' },
-        xaxis: { tickangle: -20 },
-        dragmode: false
-      };
-
-      Plotly.newPlot(container, [trace], layout, {displayModeBar: false, responsive: true});
+      // quitar prefijos y normalizar espacios
+      const soft = name
+        .replace(/^Región\s+de\s+/i, "")
+        .replace(/^Región\s+/i, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      for (const k in REGIONES_DATA) {
+        if (k.includes(soft) || soft.includes(k)) return k;
+        const lbl = REGIONES_DATA[k].label || "";
+        if (lbl.includes(soft) || soft.includes(lbl)) return k;
+      }
+      return name;
     }
 
     // ====================
-    // Datos por sección (ejemplo)
+    // RANKINGS (usa datos reales)
     // ====================
-    const regDisparejos = ['<b>3°</b>     Magallanes ', '<b>2°</b>        Atacama ', '<b>1°</b>   Antofagasta '];
-    const valDisparejos = [24.3, 29.2, 33.9];
-    const regCapital = ['<b>11°</b> Metropolitana '];
-    const valCapital = [16.7];
-    const regParejos = ['<b>15°</b>            Ñuble ', '<b>14°</b>            Maule ', '<b>13°</b>      Araucanía '];
-    const valParejos = [4.8, 9.1, 11.8];
+    const regDisparejos = ['<b>3°</b> Magallanes ', '<b>2°</b> Atacama ', '<b>1°</b> Antofagasta '];
+    const valDisparejos = [
+      REGIONES_DATA["Magallanes y de la Antártica Chilena"].brecha,
+      REGIONES_DATA["Atacama"].brecha,
+      REGIONES_DATA["Antofagasta"].brecha
+    ];
+
+    const regCapital = ['Metropolitana '];
+    const valCapital = [REGIONES_DATA["Metropolitana de Santiago"].brecha];
+
+    const regParejos = ['<b>3°</b> La Araucanía ', '<b>2°</b> Maule ', '<b>1°</b> Ñuble '];
+    const valParejos = [
+      REGIONES_DATA["La Araucanía"].brecha,
+      REGIONES_DATA["Maule"].brecha,
+      REGIONES_DATA["Ñuble"].brecha
+    ];
 
     buildStackedBars('chartDisparejos', regDisparejos, valDisparejos);
     buildStackedBars('chartCapital', regCapital, valCapital);
     buildStackedBars('chartParejos', regParejos, valParejos);
 
     // ====================
-    // MAPA
-    // ====================
-    const geojson_url = "https://raw.githubusercontent.com/caracena/chile-geojson/master/regiones.json";
-
-    // Dataset de ejemplo para el panel por región
-    // Estructura: { [Region]: { title, text, rows: [[label, valor], ...] } }
-    const regionMeta = {
-      'Antofagasta': {
-        title: 'Antofagasta',
-        text: 'Alta presencia de minería y sectores altamente masculinizados con salarios elevados. Esto amplifica la diferencia de ingresos entre hombres y mujeres.',
-        rows: [
-          ['Brecha salarial', '33,9%'],
-          ['Mediana ingreso (H)', '$500.000'],
-          ['Mediana ingreso (M)', '$400.000'],
-          ['Participación minera', '31% empleo rel. sectorial*']
-        ]
-      },
-      'Ñuble': {
-        title: 'Ñuble',
-        text: 'Estructura productiva con menor peso de sectores de alta remuneración masculinizados; salarios más bajos y con menor dispersión reducen la brecha observada.',
-        rows: [
-          ['Brecha salarial', '4,8%'],
-          ['Mediana ingreso (H)', '$380.000'],
-          ['Mediana ingreso (M)', '$362.000'],
-          ['Sector dominante', 'Agro / servicios locales']
-        ]
-      }
-      // Agrega más regiones aquí según tus datos
-    };
-
-    // Paleta discreta escalonada
-    const breaks = [5, 10, 15, 20, 25, 30, 35];
-    const colors = ['#fdd49e', '#fdbb84', '#fc8d59', '#ef6548', '#d7301f', '#b30000'];
-    const colorscale = (function steppedColorscale(breaks, colors) {
-      const zmin = breaks[0], zmax = breaks[breaks.length - 1];
-      const scale = [];
-      for (let i = 0; i < colors.length; i++) {
-        const v0 = breaks[i], v1 = breaks[i + 1];
-        const t0 = (v0 - zmin) / (zmax - zmin);
-        const t1 = (v1 - zmin) / (zmax - zmin);
-        scale.push([t0, colors[i]]);
-        scale.push([t1, colors[i]]);
-      }
-      return scale;
-    })(breaks, colors);
-
     // Utilidades del panel
+    // ====================
     function showPanel(){
       document.getElementById('right-info').style.display = 'none';
       document.getElementById('info-panel').style.display = 'block';
@@ -383,7 +399,6 @@
     function hidePanel(){
       document.getElementById('info-panel').style.display = 'none';
       document.getElementById('right-info').style.display = 'block';
-      // limpiar gráfico para evitar flashes al volver
       const pb = document.getElementById('panel-bar');
       if (pb) pb.innerHTML = '';
     }
@@ -402,29 +417,120 @@
         tb.appendChild(tr);
       });
     }
-    function renderRegionPanel(regionName, brecha){
-      const meta = regionMeta[regionName] || {
-        title: regionName,
-        text: 'Descripción pendiente para esta región. Puedes completar este texto con el contexto productivo local o notas del reporte.',
-        rows: [['Brecha salarial', `${brecha?.toFixed ? brecha.toFixed(1) : brecha}`]]
+
+    // ====================
+    // Barras del panel: eje Y fijo en $1.000.000 y hover -> negro
+    // ====================
+    function renderRegionBars(regionName, brecha){
+      const container = 'panel-bar';
+      // Encontrar la entrada por label mostrado
+      const k = Object.keys(REGIONES_DATA).find(
+        key => REGIONES_DATA[key].label === regionName
+      ) || canonicalKey(regionName);
+      const data = REGIONES_DATA[k];
+
+      const isMoney = !!data;
+      const x = isMoney ? ["Hombres", "Mujeres"] : [regionName, "Nacional"];
+      const y = isMoney ? [data.h, data.m] : [brecha, BRECHA_NACIONAL];
+
+      const baseColors = isMoney ? ['#b30000', '#ef6548'] : ['#b30000', '#ef6548'];
+
+      const trace = {
+        x, y, type: 'bar',
+        marker: { color: baseColors.slice() },
+        text: y.map(v => isMoney
+          ? `$${Number(v ?? 0).toLocaleString("es-CL")}`
+          : `${(v ?? 0).toFixed(1)}%`
+        ),
+        textposition: 'auto',
+        hovertemplate: isMoney
+          ? '%{x}: <b>$%{y:,}</b><extra></extra>'
+          : '%{x}: <b>%{y:.1f}%</b><extra></extra>',
       };
-      document.getElementById('panel-title').textContent = meta.title;
-      document.getElementById('panel-subtitle').textContent = `Brecha estimada: ${brecha?.toFixed ? brecha.toFixed(1) : brecha}`;
-      document.getElementById('panel-text').textContent = meta.text;
-      document.getElementById('panel-table-caption').textContent = 'Indicadores';
-      buildInfoTable('panel-tbody', meta.rows);
 
-      // NUEVO: dibujar el gráfico de barras del panel
-      showPanel();
-      renderRegionBars(regionName, (typeof brecha === 'number') ? brecha : BRECHA_NACIONAL);
+      const layout = {
+        title: { text: isMoney ? `Medianas de ingreso — ${regionName}` : 'Brecha Regional vs. Nacional', font: { size: 14 } },
+        margin: { t: 30, r: 10, l: 40, b: 40 },
+        paper_bgcolor: '#ffffff',
+        plot_bgcolor: '#ffffff',
+        dragmode: false,
+        xaxis: { tickangle: -10 },
+        yaxis: isMoney
+          ? { range: [0, 1_000_000], tickformat: '$~s', fixedrange: true }
+          : { rangemode: 'tozero', fixedrange: true },
+      };
 
+      Plotly.newPlot(container, [trace], layout, { displayModeBar: false, responsive: true })
+        .then(gd => {
+          const original = baseColors.slice();
+          gd.on('plotly_hover', (ev) => {
+            const i = ev.points?.[0]?.pointNumber;
+            if (i == null) return;
+            const newColors = original.slice();
+            newColors[i] = '#000000';
+            Plotly.restyle(gd, { 'marker.color': [newColors] });
+          });
+          gd.on('plotly_unhover', () => {
+            Plotly.restyle(gd, { 'marker.color': [original] });
+          });
+        });
     }
 
-    // Mapa + interacción
+    function renderRegionPanel(regionName, brecha){
+      const k = canonicalKey(regionName);
+      const data = REGIONES_DATA[k];
+
+      const title = data ? data.label : regionName;
+      const text = data
+        ? `Empleos destacados: ${data.empleos.join(", ")}.`
+        : 'Descripción pendiente para esta región.';
+      const rows = data
+        ? [
+            ["Brecha salarial", `${data.brecha.toFixed(1)}%`],
+            ["Mediana ingreso (H)", `$${Number(data.h).toLocaleString("es-CL")}`],
+            ["Mediana ingreso (M)", `$${Number(data.m).toLocaleString("es-CL")}`],
+          ]
+        : [['Brecha salarial', `${(typeof brecha === 'number') ? brecha.toFixed(1) : brecha}`]];
+
+      document.getElementById('panel-title').textContent = title;
+      document.getElementById('panel-subtitle').textContent =
+        `Brecha estimada: ${(data?.brecha ?? brecha).toFixed ? (data?.brecha ?? brecha).toFixed(1) : brecha}%`;
+      document.getElementById('panel-text').textContent = text;
+      document.getElementById('panel-table-caption').textContent = 'Indicadores';
+      buildInfoTable('panel-tbody', rows);
+
+      showPanel();
+      renderRegionBars(title, data?.brecha ?? (typeof brecha === 'number' ? brecha : BRECHA_NACIONAL));
+    }
+
+    // ====================
+    // MAPA + interacción
+    // ====================
+    const geojson_url = "https://raw.githubusercontent.com/caracena/chile-geojson/master/regiones.json";
+
     d3.json(geojson_url).then(function(geojson) {
       const locations = geojson.features.map(f => f.properties.Region);
-      // z: demo; sustituye con tus valores por región en el mismo orden que "locations"
-      const z = [20, 23.6, 33.9, 24.3, 18.1, 29.2, 19.5, 20, 16.7, 19.4, 16.7, 11.8, 20, 4.8, 9.1, 15.2];
+
+      // z desde nuestros datos, usando canonicalKey para empatar nombres
+      const z = locations.map(loc => {
+        const k = canonicalKey(loc);
+        return REGIONES_DATA[k]?.brecha ?? null;
+      });
+
+      const breaks = [5, 10, 15, 20, 25, 30, 35];
+      const colors = ['#fdd49e', '#fdbb84', '#fc8d59', '#ef6548', '#d7301f', '#b30000'];
+      const colorscale = (function steppedColorscale(breaks, colors) {
+        const zmin = breaks[0], zmax = breaks[breaks.length - 1];
+        const scale = [];
+        for (let i = 0; i < colors.length; i++) {
+          const v0 = breaks[i], v1 = breaks[i + 1];
+          const t0 = (v0 - zmin) / (zmax - zmin);
+          const t1 = (v1 - zmin) / (zmax - zmin);
+          scale.push([t0, colors[i]]);
+          scale.push([t1, colors[i]]);
+        }
+        return scale;
+      })(breaks, colors);
 
       const data = [{
         type: 'choropleth',
@@ -449,8 +555,13 @@
         margin: { t: 0, b: 60, l: 0, r: 0 },
         paper_bgcolor: '#ffffff',
         geo: {
-          scope: 'south america', center: { lon: -70, lat: -40 }, projection: { type: 'mercator', scale: 1.7 },
-          showland: false, landcolor: 'lightgray', showcountries: true, countrycolor: '#ffffff', bgcolor: '#ffffff'
+          scope: 'south america',
+          center: { lon: -70, lat: -40 },
+          projection: { type: 'mercator', scale: 1.7 },
+          showland: false,
+          showcountries: true,
+          countrycolor: '#ffffff',
+          bgcolor: '#ffffff'
         },
         dragmode: false, scrollZoom: false, doubleClick: false
       };
@@ -464,7 +575,6 @@
         if(!region) return;
 
         if (selectedRegion === region){
-          // deseleccionar
           selectedRegion = null;
           Plotly.restyle('mapa', { 'marker.line.width': [[0.2]] });
           hidePanel();
@@ -472,14 +582,11 @@
         }
 
         selectedRegion = region;
-        // resaltar borde
         const newLineWidths = locations.map(loc => loc === selectedRegion ? 2 : 0.2);
         Plotly.restyle('mapa', { 'marker.line.width': [newLineWidths] });
-        // Renderizar panel
         renderRegionPanel(region, brecha);
       });
 
-      // Botón volver
       document.getElementById('panel-back').addEventListener('click', () => {
         selectedRegion = null;
         Plotly.restyle('mapa', { 'marker.line.width': [[0.2]] });
