@@ -675,6 +675,17 @@
         const brecha = ev.points?.[0]?.z;
         if(!region) return;
 
+        val = 0;
+
+        console.log(region);
+        if (region == "Region de Antofagasta") {
+          val = 300;
+        } else if (region == "Región de Magallanes y Antártica Chilena") {
+          val = 100;
+        } else {
+          val = 0;
+        }
+
         if (selectedRegion === region){
           selectedRegion = null;
           Plotly.restyle('mapa', { 'marker.line.width': [[0.2]] });
@@ -688,7 +699,7 @@
         Plotly.restyle('mapa', { 'marker.line.width': [newLineWidths] });
         renderRegionPanel(region, brecha);
 
-        Protobject.Core.send({ speed: 300 }).to("arduino.html");
+        Protobject.Core.send({ speed: val }).to("arduino.html");
 
         audios[0].currentTime = 0; // Asegurarse de que empieza desde el inicio
         audios[0].volume = 0.1; // Ajustar el volumen (si es necesario)
