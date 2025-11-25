@@ -220,6 +220,9 @@
     <p>Desarrollado por: Xavier Morales, Fernando Navia e Ignacio Schatzke</p>
   </footer>
 
+  <script src="https://app.protobject.com/framework/p.js"></script>
+  <script src="config.js"></script>
+
   <script>
     // ====================
     // Utilidades BARRAS (listas)
@@ -676,6 +679,7 @@
           selectedRegion = null;
           Plotly.restyle('mapa', { 'marker.line.width': [[0.2]] });
           hidePanel();
+          Protobject.core.send({ speed: 0 }).to("arduino.html");
           return;
         }
 
@@ -683,6 +687,8 @@
         const newLineWidths = locations.map(loc => loc === selectedRegion ? 2 : 0.2);
         Plotly.restyle('mapa', { 'marker.line.width': [newLineWidths] });
         renderRegionPanel(region, brecha);
+
+        Protobject.core.send({ speed: 300 }).to("arduino.html");
 
         audios[0].currentTime = 0; // Asegurarse de que empieza desde el inicio
         audios[0].volume = 0.1; // Ajustar el volumen (si es necesario)
@@ -712,4 +718,13 @@
     });
   </script>
 </body>
+<style>
+  #ProtobjectPlusButton {
+    width: 80px !important;
+  }
+
+  #ProtobjectPlusButton:after {
+    content: " Connect";
+  }
+</style>
 </html>
