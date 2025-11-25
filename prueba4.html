@@ -679,7 +679,7 @@
           selectedRegion = null;
           Plotly.restyle('mapa', { 'marker.line.width': [[0.2]] });
           hidePanel();
-          Protobject.core.send({ speed: 0 }).to("arduino.html");
+          Protobject.Core.send({ speed: 0 }).to("arduino.html");
           return;
         }
 
@@ -688,7 +688,7 @@
         Plotly.restyle('mapa', { 'marker.line.width': [newLineWidths] });
         renderRegionPanel(region, brecha);
 
-        Protobject.core.send({ speed: 300 }).to("arduino.html");
+        Protobject.Core.send({ speed: 300 }).to("arduino.html");
 
         audios[0].currentTime = 0; // Asegurarse de que empieza desde el inicio
         audios[0].volume = 0.1; // Ajustar el volumen (si es necesario)
