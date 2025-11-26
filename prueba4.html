@@ -677,13 +677,10 @@
 
         val = 0;
 
-        console.log(region);
-        if (region == "Región de Antofagasta") {
+        if (brecha >= 25) {
           val = 400;
-        } else if (region == "Región de Magallanes y Antártica Chilena") {
+        } else if (brecha >= 15) {
           val = 200;
-        } else {
-          val = 0;
         }
 
         if (selectedRegion === region){
